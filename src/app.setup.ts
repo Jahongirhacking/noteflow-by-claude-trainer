@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from "@nestjs/common";
 
 /**
  * Ilovaning global sozlamalari. Bu funksiyani HAM main.ts, HAM e2e testlar chaqiradi,
@@ -10,5 +10,11 @@ import { INestApplication } from '@nestjs/common';
  *  (Middleware esa AppModule ichida `configure()` orqali ulanadi.)
  */
 export function setupApp(app: INestApplication): void {
-  void app;
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 }

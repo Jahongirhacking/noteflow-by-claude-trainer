@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { RbacModule } from "../rbac/rbac.module";
 import { UserEntity } from "../users/user.entity";
 import { UsersModule } from "../users/users.module";
 import { AuthController } from "./auth.controller";
@@ -25,6 +26,7 @@ import { LocalStrategy } from "./strategies/local.strategy";
         },
       }),
     }),
+    RbacModule,
   ],
   controllers: [AuthController],
   providers: [

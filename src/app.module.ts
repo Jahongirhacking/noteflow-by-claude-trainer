@@ -5,6 +5,7 @@ import { AuthModule } from "./auth/auth.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { databaseConfig } from "./database/database.config";
 import { UsersModule } from "./users/users.module";
+import { RbacModule } from './rbac/rbac.module';
 
 // TODO (student): ConfigModule, TypeOrmModule va boshqa modullarni shu yerga ulang.
 @Module({
@@ -14,6 +15,7 @@ import { UsersModule } from "./users/users.module";
     AuthModule,
     UsersModule,
     CategoriesModule,
+    RbacModule,
   ],
 })
 export class AppModule {}

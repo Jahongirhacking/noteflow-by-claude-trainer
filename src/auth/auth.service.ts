@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -56,5 +60,12 @@ export class AuthService {
         email: user.email,
       }),
     };
+  }
+
+  async getMe(user: CurrentUser) {
+    const currentUser = await this.userService.findById(user.id);
+    if (!currentUser) throw new NotFoundException();
+    const { passwordHash, ...rest } = currentUser;
+    return rest;
   }
 }

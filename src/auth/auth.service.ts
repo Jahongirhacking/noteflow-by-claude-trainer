@@ -1,12 +1,14 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
-import * as bcrypt from "bcrypt";
 import { Repository } from "typeorm";
+import { comparePassword, hashPassword } from "../common/utils/password.util";
+import { UserRole } from "../users/user-role.enum";
 import { UserEntity } from "../users/user.entity";
 import { UsersService } from "../users/users.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { CurrentUser } from "./interfaces/current-user.interface";
 
 @Injectable()
 export class AuthService {
@@ -18,29 +20,41 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    const foundUser = await this.userService.findByEmail(dto.email);
+    if (foundUser) throw new ConflictException();
     const { password, ...otherDto } = dto;
-    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const passwordHash = await hashPassword(dto.password);
     const user = this.userRepository.create({
       ...otherDto,
       passwordHash,
     });
     const savedUser = await this.userRepository.save(user);
-    const { passwordHash: pHash, ...rest } = savedUser;
+    const { passwordHash: _, ...rest } = savedUser;
     return rest;
   }
 
-  async login(dto: LoginDto) {
+  async validate(dto: LoginDto): Promise<CurrentUser | null> {
     try {
       const user = await this.userService.findByEmail(dto.email);
-      if (!bcrypt.compare(dto.password, user.passwordHash))
-        throw new UnauthorizedException("Invalid credintials");
+      if (!user) throw new Error();
+      if (!(await comparePassword(dto.password, user.passwordHash)))
+        return null;
       return {
-        accessToken: this.jwtService.sign({
-          sub: user.id,
-        }),
+        id: user.id,
+        email: user.email,
+        role: user.role as UserRole,
       };
     } catch {
-      throw new UnauthorizedException("Invalid credintials");
+      return null;
     }
+  }
+
+  async login(user: CurrentUser) {
+    return {
+      accessToken: this.jwtService.sign({
+        sub: user.id,
+        email: user.email,
+      }),
+    };
   }
 }

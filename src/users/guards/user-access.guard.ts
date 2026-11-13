@@ -8,7 +8,7 @@ import {
 import { isUUID } from "class-validator";
 import type { Request } from "express";
 import { Observable } from "rxjs";
-import { CurrentUser } from "../../auth/interfaces/current-user.interface";
+import { ICurrentUser } from "../../auth/interfaces/current-user.interface";
 import { UserRole } from "../user-role.enum";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class UserAccessGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    const user = req.user as CurrentUser;
+    const user = req.user as ICurrentUser;
     const reqUserId = req.params.id;
     if (!isUUID(reqUserId)) throw new BadRequestException();
     if (!user) return false;

@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { CategoryEntity } from "../categories/category.entity";
+import { NoteEntity } from "../notes/note.entity";
 import { UserRole } from "./user-role.enum";
 
 @Entity("users")
@@ -34,4 +35,7 @@ export class UserEntity {
 
   @OneToMany(() => CategoryEntity, (category) => category.userId)
   categories: CategoryEntity[];
+
+  @OneToMany(() => NoteEntity, (note) => note.userId)
+  note: NoteEntity[];
 }

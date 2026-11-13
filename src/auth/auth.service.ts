@@ -12,7 +12,7 @@ import { UserEntity } from "../users/user.entity";
 import { UsersService } from "../users/users.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-import { CurrentUser } from "./interfaces/current-user.interface";
+import { ICurrentUser } from "./interfaces/current-user.interface";
 
 @Injectable()
 export class AuthService {
@@ -37,7 +37,7 @@ export class AuthService {
     return rest;
   }
 
-  async validate(dto: LoginDto): Promise<CurrentUser | null> {
+  async validate(dto: LoginDto): Promise<ICurrentUser | null> {
     try {
       const user = await this.userService.findByEmail(dto.email);
       if (!user) throw new Error();
@@ -53,7 +53,7 @@ export class AuthService {
     }
   }
 
-  async login(user: CurrentUser) {
+  async login(user: ICurrentUser) {
     return {
       accessToken: this.jwtService.sign({
         sub: user.id,
@@ -62,7 +62,7 @@ export class AuthService {
     };
   }
 
-  async getMe(user: CurrentUser) {
+  async getMe(user: ICurrentUser) {
     const currentUser = await this.userService.findById(user.id);
     if (!currentUser) throw new NotFoundException();
     const { passwordHash, ...rest } = currentUser;

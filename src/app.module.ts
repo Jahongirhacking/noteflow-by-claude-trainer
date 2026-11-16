@@ -9,6 +9,7 @@ import { databaseConfig } from "./database/database.config";
 import { NotesModule } from "./notes/notes.module";
 import { RbacModule } from "./rbac/rbac.module";
 import { UsersModule } from "./users/users.module";
+import { AttachmentsModule } from './attachments/attachments.module';
 
 // TODO (student): ConfigModule, TypeOrmModule va boshqa modullarni shu yerga ulang.
 @Module({
@@ -21,6 +22,7 @@ import { UsersModule } from "./users/users.module";
     RbacModule,
     NotesModule,
     CommonModule,
+    AttachmentsModule,
   ],
 })
 export class AppModule implements NestModule {

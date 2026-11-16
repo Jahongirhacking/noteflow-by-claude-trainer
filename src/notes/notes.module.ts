@@ -10,5 +10,6 @@ import { ParseNotesPipe } from "./pipes/parse-notes.pipe";
   controllers: [NotesController],
   providers: [NotesService, ParseNotesPipe],
   imports: [TypeOrmModule.forFeature([NoteEntity]), CategoriesModule],
+  exports: [NotesService],
 })
 export class NotesModule {}

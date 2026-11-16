@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { AttachmentEntity } from "../attachments/attachment.entity";
 import { CategoryEntity } from "../categories/category.entity";
 import { UserEntity } from "../users/user.entity";
 
@@ -46,4 +48,7 @@ export class NoteEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => AttachmentEntity, (attachment) => attachment.noteId)
+  attachments: AttachmentEntity[];
 }

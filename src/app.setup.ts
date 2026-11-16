@@ -1,4 +1,5 @@
 import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { TimingInterceptor } from "./common/interceptors/timing.interceptor";
 
 /**
  * Ilovaning global sozlamalari. Bu funksiyani HAM main.ts, HAM e2e testlar chaqiradi,
@@ -17,4 +18,5 @@ export function setupApp(app: INestApplication): void {
       forbidNonWhitelisted: true,
     }),
   );
+  app.useGlobalInterceptors(new TimingInterceptor());
 }

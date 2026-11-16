@@ -3,10 +3,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ICurrentUser } from "../auth/interfaces/current-user.interface";
 import { CategoriesService } from "../categories/categories.service";
+import { buildPaginationMeta } from "../common/utils/pagination.util";
 import { CreateNoteDto } from "./dto/create-note.dto";
 import { UpdateNoteDto } from "./dto/update-note.dto";
 import { INotesTransformed } from "./interfaces/notes-query.interface";
 import { NoteEntity } from "./note.entity";
+import { buildNotesWhere } from "./notes-query.util";
 
 @Injectable()
 export class NotesService {
@@ -32,9 +34,19 @@ export class NotesService {
   }
 
   async getNotes(userId: ICurrentUser["id"], parsedQuery: INotesTransformed) {
-    return this.notesRepository.find({
-      where: { userId, categoryId: parsedQuery.categoryId },
+    const { pagination, ...args } = parsedQuery;
+    const [notes, total] = await this.notesRepository.findAndCount({
+      where: buildNotesWhere(userId, args),
+      skip: pagination.skip,
+      take: pagination.limit,
+      order: {
+        createdAt: "DESC",
+      },
     });
+    return {
+      data: notes,
+      meta: buildPaginationMeta(total, pagination.page, pagination.limit),
+    };
   }
 
   async getNoteById(userId: ICurrentUser["id"], noteId: string) {

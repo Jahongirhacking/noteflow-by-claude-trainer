@@ -4,6 +4,7 @@ import {
   Injectable,
   PipeTransform,
 } from "@nestjs/common";
+import { isUUID } from "class-validator";
 import { ParsePaginationPipe } from "../../common/pipes/parse-pagination.pipe";
 import {
   INotesQuery,
@@ -37,10 +38,20 @@ export class ParseNotesPipe implements PipeTransform {
       throw new BadRequestException("isArchived must be true or false");
     }
 
+    if (value.categoryId && !isUUID(value.categoryId))
+      throw new BadRequestException();
+
+    const { page: _, limit: __, ...properties } = value;
+
     return {
       pagination,
-      ...value,
-      isArchived: value.isArchived === "true",
+      ...properties,
+      isArchived:
+        value.isArchived === "true"
+          ? true
+          : value.isArchived === "false"
+            ? false
+            : undefined,
     };
   }
 }

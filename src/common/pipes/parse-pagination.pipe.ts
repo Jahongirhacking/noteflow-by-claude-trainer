@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 import { IPagination } from "../interfaces/pagination.interface";
+import { getPagination } from "../utils/pagination.util";
 
 @Injectable()
 export class ParsePaginationPipe implements PipeTransform<
@@ -14,10 +15,6 @@ export class ParsePaginationPipe implements PipeTransform<
     if (!Number.isInteger(limit) || limit < 1 || limit > 50)
       throw new BadRequestException();
 
-    return {
-      page,
-      limit,
-      skip: (page - 1) * limit,
-    };
+    return getPagination({ page, limit });
   }
 }

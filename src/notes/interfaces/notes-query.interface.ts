@@ -13,5 +13,5 @@ type INotesWithoutPagination = Omit<
 >;
 export interface INotesTransformed extends INotesWithoutPagination {
   pagination: IPagination;
-  isArchived: boolean;
+  isArchived?: boolean;
 }

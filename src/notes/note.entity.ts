@@ -24,17 +24,20 @@ export class NoteEntity {
   @Column({ type: "boolean", default: false })
   isArchived: boolean;
 
-  @Column({ type: "varchar", nullable: true })
-  catgeoryId: string;
+  @Column({ type: "varchar", nullable: true, default: null })
+  categoryId: string | null;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.id)
+  @ManyToOne(() => CategoryEntity, (category) => category.id, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
   @JoinColumn({ name: "categoryId" })
-  category: CategoryEntity;
+  category: CategoryEntity | null;
 
   @Column({ type: "varchar" })
   userId: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: "CASCADE" })
   @JoinColumn({ name: "userId" })
   user: UserEntity;
 

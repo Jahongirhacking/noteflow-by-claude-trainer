@@ -38,6 +38,6 @@ export class CategoryEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => NoteEntity, (note) => note.catgeoryId)
+  @OneToMany(() => NoteEntity, (note) => note.categoryId)
   notes: NoteEntity[];
 }

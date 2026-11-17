@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { unlink } from "fs/promises";
 import { Repository } from "typeorm";
 import { ICurrentUser } from "../auth/interfaces/current-user.interface";
+import { baseAttachmentDir } from "../attachments/file-validation.util";
 import { CategoriesService } from "../categories/categories.service";
 import { buildPaginationMeta } from "../common/utils/pagination.util";
 import { CreateNoteDto } from "./dto/create-note.dto";
@@ -73,8 +75,19 @@ export class NotesService {
   }
 
   async deleteNoteById(userId: ICurrentUser["id"], noteId: string) {
-    const note = await this.getNoteById(userId, noteId);
-    this.notesRepository.remove(note);
+    await this.getNoteById(userId, noteId);
+    const note = await this.notesRepository.findOne({
+      where: { id: noteId },
+      relations: { attachments: true },
+    });
+    if (!note) throw new NotFoundException();
+    const storageNames = (note.attachments ?? []).map((a) => a.storageName);
+    await this.notesRepository.remove(note);
+    await Promise.all(
+      storageNames.map((name) =>
+        unlink(`${baseAttachmentDir}/${name}`).catch(() => undefined),
+      ),
+    );
   }
 
   async makeNoteArchiveById(userId: ICurrentUser["id"], noteId: string) {

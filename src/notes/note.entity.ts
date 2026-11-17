@@ -49,6 +49,6 @@ export class NoteEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => AttachmentEntity, (attachment) => attachment.noteId)
+  @OneToMany(() => AttachmentEntity, (attachment) => attachment.note)
   attachments: AttachmentEntity[];
 }

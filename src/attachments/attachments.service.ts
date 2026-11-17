@@ -37,11 +37,18 @@ export class AttachmentsService {
         size: file.size,
         storageName,
       });
-      return this.attachmentRepository.save(attachment);
+      const { storageName: _omit, ...saved } =
+        await this.attachmentRepository.save(attachment);
+      return saved;
     } catch {
-      unlink(filePath);
+      await unlink(filePath).catch(() => undefined);
       throw new InternalServerErrorException();
     }
+  }
+
+  async getAttachmentsByNote(userId: string, noteId: string) {
+    await this.notesService.getNoteById(userId, noteId);
+    return this.attachmentRepository.find({ where: { noteId } });
   }
 
   async getAttachmentById(userId: ICurrentUser["id"], attachmentId: string) {
@@ -55,7 +62,11 @@ export class AttachmentsService {
 
   async deleteAttachmentById(userId: ICurrentUser["id"], attachmentId: string) {
     const attachment = await this.getAttachmentById(userId, attachmentId);
-    await unlink(`${baseAttachmentDir}/${attachment.storageName}`);
-    this.attachmentRepository.remove(attachment);
+    try {
+      await unlink(`${baseAttachmentDir}/${attachment.storageName}`);
+    } catch (err: any) {
+      if (err?.code !== "ENOENT") throw err;
+    }
+    await this.attachmentRepository.remove(attachment);
   }
 }

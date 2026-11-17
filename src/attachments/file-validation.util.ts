@@ -4,6 +4,7 @@ import {
   UnsupportedMediaTypeException,
 } from "@nestjs/common";
 import { randomUUID } from "crypto";
+import path from "path";
 import { cwd } from "process";
 
 export const ALLOWED_MIME_TYPES: string[] = [
@@ -20,10 +21,13 @@ export const generateStorageName = (filename: string) => {
   return `${randomUUID()}.${extension.toLowerCase()}`;
 };
 
-export const baseAttachmentDir = `${cwd()}/uploads`;
+export const baseAttachmentDir = path.resolve(
+  cwd(),
+  process.env.UPLOAD_DIR || "uploads",
+);
 
 export const validateUploadedFile = (file?: Partial<Express.Multer.File>) => {
-  if (!file) {
+  if (!file || !file.originalname) {
     throw new BadRequestException("File is required");
   }
 
